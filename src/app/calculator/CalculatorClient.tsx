@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
+import { supabase } from '@/lib/supabase';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -49,12 +50,6 @@ interface CostComponent {
   is_recurring: boolean;
 }
 
-interface Props {
-  states: State[];
-  chargerTypes: ChargerType[];
-  subsidies: Subsidy[];
-  costComponents: CostComponent[];
-}
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -80,12 +75,29 @@ const STEPS = ['Location', 'Revenue', 'Subsidies', 'Summary'];
 
 // ── Main Component ─────────────────────────────────────────────────────────
 
-export default function CalculatorClient({
-  states,
-  chargerTypes,
-  subsidies,
-  costComponents,
-}: Props) {
+export default function CalculatorClient() {
+  // Remote data
+  const [states, setStates] = useState<State[]>([]);
+  const [chargerTypes, setChargerTypes] = useState<ChargerType[]>([]);
+  const [subsidies, setSubsidies] = useState<Subsidy[]>([]);
+  const [costComponents, setCostComponents] = useState<CostComponent[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    Promise.all([
+      supabase.from('states').select('*').order('name'),
+      supabase.from('charger_types').select('*').order('power_kw'),
+      supabase.from('subsidies').select('*'),
+      supabase.from('cost_components').select('*'),
+    ]).then(([s, ct, sub, cc]) => {
+      setStates(s.data ?? []);
+      setChargerTypes(ct.data ?? []);
+      setSubsidies(sub.data ?? []);
+      setCostComponents(cc.data ?? []);
+      setLoading(false);
+    });
+  }, []);
+
   // Navigation
   const [step, setStep] = useState(1);
 
@@ -228,6 +240,15 @@ export default function CalculatorClient({
   };
 
   // ── Render ────────────────────────────────────────────────────────────────
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center gap-4">
+        <span className="text-4xl animate-pulse">⚡</span>
+        <p className="text-zinc-400 text-sm">Loading data…</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-zinc-950 text-zinc-100 flex flex-col" style={{ minHeight: 'calc(100vh - 4rem)' }}>
