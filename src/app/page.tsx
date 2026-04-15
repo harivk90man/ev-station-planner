@@ -32,7 +32,7 @@ const steps = [
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen bg-zinc-950 text-zinc-100">
+    <div className="flex flex-col min-h-screen bg-zinc-950 text-zinc-100 overflow-x-hidden">
       {/* Nav */}
       <header className="border-b border-zinc-800 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -66,12 +66,10 @@ export default function Home() {
             India EV Revolution
           </span>
 
-          <h1 className="text-5xl md:text-7xl font-black tracking-tight leading-none mb-6">
-            <span className="text-white">1.3 Million</span>
-            <br />
-            <span className="text-emerald-400">Charging Stations</span>
-            <br />
-            <span className="text-zinc-400 text-4xl md:text-5xl font-bold">
+          <h1 className="text-[2.5rem] sm:text-5xl md:text-7xl font-black tracking-tight leading-tight mb-6">
+            <span className="text-white block">1.3 Million</span>
+            <span className="text-emerald-400 block">Charging Stations</span>
+            <span className="text-zinc-400 text-2xl sm:text-4xl md:text-5xl font-bold block mt-1">
               needed by 2030
             </span>
           </h1>
